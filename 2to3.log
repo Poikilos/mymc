@@ -1,0 +1,1454 @@
+(base) redacted@redacted:~/git/mymc$ git switch python3-Poikilos
+Branch 'python3-Poikilos' set up to track remote branch 'python3-Poikilos' from 'origin'.
+Switched to a new branch 'python3-Poikilos'
+(base) redacted@redacted:~/git/mymc$ 2to3-3.9 --write *.py*
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: Refactored gui.py
+--- gui.py	(original)
++++ gui.py	(refactored)
+@@ -12,7 +12,7 @@
+ import os
+ import sys
+ import struct
+-import cStringIO
++import io
+ import time
+ from functools import partial
+ 
+@@ -96,12 +96,12 @@
+ 	"""Convert the two parts of an icon.sys title into one string."""
+ 	
+ 	title = title[0] + " " + title[1]
+-	return u" ".join(title.split())
++	return " ".join(title.split())
+ 
+ def _get_icon_resource_as_images(name):
+ 	ico = guires.resources[name]
+ 	images = []
+-	f = cStringIO.StringIO(ico)
++	f = io.StringIO(ico)
+ 	count = struct.unpack("<HHH", ico[0:6])[2]
+ 	# count = wx.Image_GetImageCount(f, wx.BITMAP_TYPE_ICO)
+ 	for i in range(count):
+@@ -347,7 +347,7 @@
+ 		r = mymcicon.init_icon_renderer(focus.GetHandle(),
+ 					       self.GetHandle())
+ 		if r == -1:
+-			print "init_icon_renderer failed"
++			print("init_icon_renderer failed")
+ 			self.failed = True
+ 			return
+ 		
+@@ -384,7 +384,7 @@
+ 			r = mymcicon.load_icon(icon_sys, len(icon_sys),
+ 					      icon, len(icon))
+ 		if r != 0:
+-			print "load_icon", r
++			print("load_icon", r)
+ 			self.failed = True
+ 
+ 	def _set_lighting(self, lighting, vertex_diffuse, alt_lighting,
+@@ -634,13 +634,13 @@
+ 		if self.mc != None:
+ 			try:
+ 				self.mc.close()
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value)
+ 			self.mc = None
+ 		if self.f != None:
+ 			try:
+ 				self.f.close()
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value)
+ 			self.f = None
+ 		self.mcname = None
+@@ -648,7 +648,7 @@
+ 	def refresh(self):
+ 		try:
+ 			self.dirlist.update(self.mc)
+-		except EnvironmentError, value:
++		except EnvironmentError as value:
+ 			self.mc_error(value)
+ 			self._close_mc()
+ 			self.dirlist.update(None)
+@@ -676,7 +676,7 @@
+ 		try:
+ 			f = file(filename, "r+b")
+ 			mc = ps2mc.ps2mc(f)
+-		except EnvironmentError, value:
++		except EnvironmentError as value:
+ 			if f != None:
+ 				f.close()
+ 			self.mc_error(value, filename)
+@@ -718,8 +718,8 @@
+ 				icon = f.read()
+ 			finally:
+ 				f.close()
+-		except EnvironmentError, value:
+-			print "icon failed to load", value
++		except EnvironmentError as value:
++			print("icon failed to load", value)
+ 			self.icon_win.load_icon(None, None)
+ 			return
+ 
+@@ -758,7 +758,7 @@
+ 				sf = mc.export_save_file("/" + dirname)
+ 				longname = ps2save.make_longname(dirname, sf)
+ 				sfiles.append((dirname, sf, longname))
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value. dirname)
+ 
+ 		if len(sfiles) == 0:
+@@ -786,7 +786,7 @@
+ 						sf.save_ems(f)
+ 				finally:
+ 					f.close()
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value, fn)
+ 				return
+ 
+@@ -808,7 +808,7 @@
+ 				sf.save_ems(f)
+ 				f.close()
+ 				count += 1
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value, fn)
+ 		if count > 0:
+ 			if os.path.isabs(dir):
+@@ -868,7 +868,7 @@
+ 			try:
+ 				self._do_import(fn)
+ 				success = fn
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value, fn)
+ 
+ 		if success != None:
+@@ -904,7 +904,7 @@
+ 		for dn in dirnames:
+ 			try:
+ 				mc.rmdir("/" + dn)
+-			except EnvironmentError, value:
++			except EnvironmentError as value:
+ 				self.mc_error(value, dn)
+ 
+ 		mc.check()
+@@ -936,11 +936,11 @@
+ 
+  	gc.collect()
+  	for o in gc.garbage:
+- 		print 
+- 		print o
++ 		print() 
++ 		print(o)
+  		if type(o) == ps2mc.ps2mc_file:
+  			for m in dir(o):
+- 				print m, getattr(o, m)
++ 				print(m, getattr(o, m))
+ 
+ 
+ # 	while True:
+RefactoringTool: No changes to guires.py
+RefactoringTool: Refactored lzari.py
+--- lzari.py	(original)
++++ lzari.py	(refactored)
+@@ -132,16 +132,16 @@
+ 			self.code = 0
+ 			# reverse the order of sym_cum so bisect_right() can
+ 			# be used for faster searching
+-			self.sym_cum = range(0, MAX_CHAR + 1)
++			self.sym_cum = list(range(0, MAX_CHAR + 1))
+ 		else:
+ 			self.shifts = 0
+-			self.char_to_symbol = range(1, MAX_CHAR + 1)
+-			self.sym_cum = range(MAX_CHAR, -1, -1)
++			self.char_to_symbol = list(range(1, MAX_CHAR + 1))
++			self.sym_cum = list(range(MAX_CHAR, -1, -1))
+ 			self.next_table = [None] * HIST_LEN
+ 			self.next2_table = [None] * HIST_LEN
+ 			self.suffix_table = {}
+ 
+-		self.symbol_to_char = [0] + range(MAX_CHAR)
++		self.symbol_to_char = [0] + list(range(MAX_CHAR))
+ 		self.sym_freq = [0] + [1] * MAX_CHAR
+ 		self.position_cum = [0] * (HIST_LEN + 1)
+ 		a = 0
+@@ -437,12 +437,12 @@
+ 		r = self.add_suffix_2(pos, find)
+ 		start_pos = self.start_pos
+ 		if find and r[0] != None:
+-			print ("%4d %02x %4d %2d"
++			print(("%4d %02x %4d %2d"
+ 			       % (pos - start_pos, ord(self.src[pos]),
+-				  r[0] - start_pos, r[1]))
++				  r[0] - start_pos, r[1])))
+ 		else:
+-			print ("%4d %02x"
+-				       % (pos - start_pos, ord(self.src[pos])))
++			print(("%4d %02x"
++				       % (pos - start_pos, ord(self.src[pos]))))
+ 		return r
+ 	
+ 	add_suffix = add_suffix_2
+@@ -582,7 +582,7 @@
+ 		
+ 		a = string_to_bit_array(src)
+ 		a.fromlist([0] * 32)	 # add some extra bits 
+-		self.in_iter = iter(a).next
++		self.in_iter = iter(a).__next__
+ 
+ 		out = array.array('B', "\0") * out_length
+ 		outpos = 0
+@@ -646,7 +646,7 @@
+ 		out = ctypes.create_string_buffer(out_length)
+ 		if (mylzari_decode(src, len(src), out, out_length, progress)
+ 		    == -1):
+-			raise ValueError, "compressed input is corrupt"
++			raise ValueError("compressed input is corrupt")
+ 		return ctypes.string_at(out, out_length)
+ 
+ 	def encode(src, progress = None):
+@@ -654,7 +654,7 @@
+ 							   progress)
+ 		# print r, compressed.value, comp_len
+ 		if r == -1:
+-			raise MemoryError, "out of memory during compression"
++			raise MemoryError("out of memory during compression")
+ 		if compressed.value == None:
+ 			return ""
+ 		ret = ctypes.string_at(compressed.value, comp_len.value)
+@@ -679,7 +679,7 @@
+ 		now = os.times()
+ 	out.write(dest)
+ 	out.close()
+-	print "time:", now[0] - start[0], now[1] - start[1], now[4] - start[4]
++	print("time:", now[0] - start[0], now[1] - start[1], now[4] - start[4])
+ 
+ 
+ def _get_hotshot_lineinfo(filename):
+@@ -694,7 +694,7 @@
+ 			else:
+ 				a[0] += 1
+ 				a[1] += tdelta
+-	return timings.items()
++	return list(timings.items())
+ 
+ def _dump_hotshot_lineinfo(log):
+ 	a = sorted(_get_hotshot_lineinfo(log))
+@@ -703,10 +703,10 @@
+ 	total_time = sum((time[1]
+ 			  for (loc, time) in a))
+ 	for (loc, [count, time]) in a:
+-		print ("%8d %6.3f%%  %8d %6.3f%%"
++		print(("%8d %6.3f%%  %8d %6.3f%%"
+ 		       % (time, time * 100.0 / total_time,
+-			  count, count * 100.0 / total_count)),
+-		print "%s:%d(%s)" % loc
++			  count, count * 100.0 / total_count)), end=' ')
++		print("%s:%d(%s)" % loc)
+ 
+ def _dump_hotshot_lineinfo2(log):
+ 	cur = None
+@@ -719,7 +719,7 @@
+ 		if cur != filename:
+ 			if cur != None and f != None:
+ 				for line in f:
+-					print line[:-1]
++					print(line[:-1])
+ 				f.close()
+ 			try:
+ 				f = file(filename, "r")
+@@ -727,17 +727,17 @@
+ 				f = None
+ 			cur = filename
+ 			l = 0
+-			print "#", filename
++			print("#", filename)
+ 		if f != None:
+ 			while l < lineno:
+-				print f.readline()[:-1]
++				print(f.readline()[:-1])
+ 				l += 1
+-		print ("# %8d %6.3f%%  %8d %6.3f%%"
++		print(("# %8d %6.3f%%  %8d %6.3f%%"
+ 		       % (time, time * 100.0 / total_time,
+-			  count, count * 100.0 / total_count))
++			  count, count * 100.0 / total_count)))
+ 	if cur != None and f != None:
+ 		for line in f:
+-			print line[:-1]
++			print(line[:-1])
+ 		f.close()
+ 	
+ def main(args):
+@@ -747,7 +747,7 @@
+ 		import profile
+ 		pr = profile.Profile()
+ 		for i in range(5):
+-			print pr.calibrate(100000)
++			print(pr.calibrate(100000))
+ 		return
+ 	elif args[1] == "p":
+ 		import profile
+RefactoringTool: Refactored mymc.py
+--- mymc.py	(original)
++++ mymc.py	(refactored)
+@@ -50,7 +50,7 @@
+ 
+ 		def __setattr__(self, name, value):
+ 			if name == "encoding":
+-				raise TypeError, "readonly attribute"
++				raise TypeError("readonly attribute")
+ 			return setattr(object.__getattribute__(self, "_f"),
+ 				       name, value)
+ 
+@@ -218,22 +218,22 @@
+ 			elif ftype == "sps":
+ 				sf.load_sharkport(f)
+ 			elif ftype == "npo":
+-				raise io_error, (EIO, "nPort saves"
++				raise io_error(EIO, "nPort saves"
+ 						 " are not supported.",
+ 						 filename)
+ 			else:
+-				raise io_error, (EIO, "Save file format not"
++				raise io_error(EIO, "Save file format not"
+ 						 " recognized", filename)
+ 		finally:
+ 			f.close()
+ 		dirname = opts.directory
+ 		if dirname == None:
+ 			dirname = sf.get_directory()[8]
+-		print "Importing", filename, "to", dirname
++		print("Importing", filename, "to", dirname)
+ 		if not mc.import_save_file(sf, opts.ignore_existing,
+ 						opts.directory):
+-			print (filename + ": already in memory card image,"
+-			       " ignored.")
++			print((filename + ": already in memory card image,"
++			       " ignored."))
+ 
+ #re_num = re.compile("[0-9]+")
+ 
+@@ -277,7 +277,7 @@
+ 			
+ 		f = file(filename, "wb")
+ 		try:
+-			print "Exporing", dirname, "to", filename
++			print("Exporing", dirname, "to", filename)
+ 			
+ 			if opts.type == "max":
+ 				sf.save_max_drive(f)
+@@ -394,10 +394,10 @@
+ 			if type != None:
+ 				protection = type
+ 				
+-			print "%-32s %s" % (ent[8], title[0])
+-			print ("%4dKB %-25s %s"
+-			       % (length / 1024, protection, title[1]))
+-			print
++			print("%-32s %s" % (ent[8], title[0]))
++			print(("%4dKB %-25s %s"
++			       % (length / 1024, protection, title[1])))
++			print()
+ 	finally:
+ 		if f != None:
+ 			f.close()
+@@ -412,18 +412,18 @@
+ 	else:
+ 		free = "%d" % free
+ 
+-	print free + " KB Free"
++	print(free + " KB Free")
+ 
+ def do_df(cmd, mc, opts, args, opterr):
+ 	if len(args) != 0:
+ 		opterr("Incorrect number of arguments.")
+-	print mc.f.name + ":", mc.get_free_space(), "bytes free."
++	print(mc.f.name + ":", mc.get_free_space(), "bytes free.")
+ 
+ def do_check(cmd, mc, opts, args, opterr):
+ 	if len(args) != 0:
+ 		opterr("Incorrect number of arguments.")
+ 	if mc.check():
+-		print "No errors found."
++		print("No errors found.")
+ 		return 0
+ 	return 1
+ 	
+@@ -447,7 +447,7 @@
+ 		except EnvironmentError:
+ 			exists = False
+ 		if exists:
+-			raise io_error, (EEXIST, "file exists", mcname)
++			raise io_error(EEXIST, "file exists", mcname)
+ 
+ 	f = file(mcname, "w+b")
+ 	try:
+@@ -475,7 +475,7 @@
+ 	pad = "\0" * mc.cluster_size
+ 	f = mc.open(args[0], "wb")
+ 	try:
+-		for i in xrange(length):
++		for i in range(length):
+ 			f.write(pad)
+ 	finally:
+ 		f.close()
+@@ -484,15 +484,15 @@
+ def do_frob(cmd, mc, opts, args, opterr):
+ 	mc.write_superblock()
+ 
+-_trans = string.maketrans("".join(map(chr, range(32))), " " * 32)
++_trans = string.maketrans("".join(map(chr, list(range(32)))), " " * 32)
+ 
+ def _print_bin(base, s):
+ 	for off in range(0, len(s), 16):
+-		print "%04X" % (base + off),
++		print("%04X" % (base + off), end=' ')
+ 		a = s[off : off + 16]
+ 		for b in a:
+-			print "%02X" % ord(b),
+-		print "", a.translate(_trans)
++			print("%02X" % ord(b), end=' ')
++		print("", a.translate(_trans))
+ 	
+ def _print_erase_block(mc, n):
+ 	ppb = mc.pages_per_erase_block
+@@ -500,12 +500,12 @@
+ 	for i in range(ppb):
+ 		s = mc.read_page(base + i)
+ 		_print_bin(i * mc.page_size, s)
+-		print
++		print()
+ 		
+ def do_print_good_blocks(cmd, mc, opts, args, opterr):
+-	print "good_block2:"
++	print("good_block2:")
+ 	_print_erase_block(mc, mc.good_block2)
+-	print "good_block1:"
++	print("good_block1:")
+ 	_print_erase_block(mc, mc.good_block1)
+ 
+ def do_ecc_check(cmd, mc, opts, args, opterr):
+@@ -513,7 +513,7 @@
+ 		try:
+ 			mc.read_page(i)
+ 		except ps2mc.ecc_error:
+-			print "bad: %05x" % i
++			print("bad: %05x" % i)
+ 
+ opt = optparse.make_option
+ 
+@@ -688,7 +688,7 @@
+ 	def exit(self, status = 0, msg = None):
+ 		if msg:
+ 			sys.stderr.write(msg)
+-		raise subopt_error, status
++		raise subopt_error(status)
+ 
+ class my_help_formatter(optparse.IndentedHelpFormatter):
+ 	"""A better formatter for optparser's help message"""
+@@ -791,7 +791,7 @@
+ 				# print "f.close()"
+ 				f.close()
+ 
+-	except EnvironmentError, value:
++	except EnvironmentError as value:
+ 		if getattr(value, "filename", None) != None:
+ 			write_error(value.filename, value.strerror)
+ 			ret = 1
+@@ -804,10 +804,11 @@
+ 		if opts.debug:
+ 			raise
+ 
+-	except subopt_error, (ret,):
++	except subopt_error as xxx_todo_changeme:
++		(ret,) = xxx_todo_changeme.args
+ 		pass
+ 	
+-	except (ps2mc.error, ps2save.error), value:
++	except (ps2mc.error, ps2save.error) as value:
+ 		fn = getattr(value, "filename", None)
+ 		if fn == None:
+ 			fn = mcname
+RefactoringTool: No changes to ps2mc_dir.py
+RefactoringTool: Refactored ps2mc_ecc.py
+--- ps2mc_ecc.py	(original)
++++ ps2mc_ecc.py	(refactored)
+@@ -105,13 +105,13 @@
+ 	#				    lp_comp, cp_comp)
+ 
+ 	if lp_comp == 0x7F and cp_comp == 0x07:
+-		print "corrected 1"
++		print("corrected 1")
+ 		# correctable 1 bit error in data
+ 		s[lp1_diff] ^= 1 << (cp_diff >> 4)
+ 		return ECC_CHECK_CORRECTED
+ 	if ((cp_diff == 0 and lp0_diff == 0 and lp1_diff == 0)
+ 	      or _popcount(lp_comp) + _popcount(cp_comp) == 1):
+-		print "corrected 2"
++		print("corrected 2")
+ 		# correctable 1 bit error in ECC
+ 		# (and/or one of the unused bits was set)
+ 		ecc[0] = computed[0]
+@@ -141,7 +141,7 @@
+ 	for i in range(div_round_up(len(page), 128)):
+ 		a = array.array('B')
+ 		a.fromstring(page[i * 128 : i * 128 + 128])
+-		chunks.append((a, map(ord, spare[i * 3 : i * 3 + 3])))
++		chunks.append((a, list(map(ord, spare[i * 3 : i * 3 + 3]))))
+ 	
+ 	r = [ecc_check(s, ecc)
+ 	     for (s, ecc) in chunks]
+RefactoringTool: Refactored ps2mc.py
+--- ps2mc.py	(original)
++++ ps2mc.py	(refactored)
+@@ -135,10 +135,10 @@
+ 		lru_list = self._lru_list
+ 		i = 0
+ 		while i != len(self._lru_list):
+-			print "%d: %s, " % (i, str(lru_list[i][1])), 
++			print("%d: %s, " % (i, str(lru_list[i][1])), end=' ') 
+ 			i = lru_list[i][3]
+-		print
+-		print self._index_map
++		print()
++		print(self._index_map)
+ 			
+ 	def _move_to_front(self, i):
+ 		lru_list = self._lru_list
+@@ -336,7 +336,7 @@
+ 
+ 		if (cluster < file_cluster_end
+ 		    or len(self.fat_chain) != file_cluster_end):
+-			raise corrupt, ("file length doesn't match cluster"
++			raise corrupt("file length doesn't match cluster"
+ 					" chain length", mc.f)
+ 
+ 		for i in range(file_cluster_end, n):
+@@ -370,7 +370,7 @@
+ 		
+ 	def read(self, size = None, eol = None):
+ 		if self.closed:
+-			raise ValueError, "file is closed"
++			raise ValueError("file is closed")
+ 
+ 		pos = self._pos
+ 		cluster_size = self.mc.cluster_size
+@@ -397,14 +397,14 @@
+ 
+ 	def write(self, out, _set_modified = True):
+ 		if self.closed:
+-			raise ValueError, "file is closed"
++			raise ValueError("file is closed")
+ 	
+ 		cluster_size = self.mc.cluster_size
+ 		pos = self._pos
+ 		if self._append: 
+ 			pos = self.length
+ 		elif not self._write:
+-			raise io_error, (EACCES, "file not opened for writing",
++			raise io_error(EACCES, "file not opened for writing",
+ 					 self.name)
+ 
+ 		size = len(out)
+@@ -424,7 +424,7 @@
+ 					buf = "\0" * cluster_size
+ 				buf = buf[:off] + s + buf[off + l:]
+ 			if not self.write_file_cluster(cluster, buf):
+-				raise io_error, (ENOSPC,
++				raise io_error(ENOSPC,
+ 						 "out of space on image",
+ 						 self.name)
+ 			self._pos = pos
+@@ -446,7 +446,7 @@
+ 		self.fat_chain = None
+ 		self.buffer = None
+ 
+-	def next(self):
++	def __next__(self):
+ 		r = self.readline()
+ 		if r == "":
+ 			raise StopIteration
+@@ -460,7 +460,7 @@
+ 
+ 	def seek(self, offset, whence = 0):
+ 		if self.closed:
+-			raise ValueError, "file is closed"
++			raise ValueError("file is closed")
+ 
+ 		if whence == 1:
+ 			base = self._pos
+@@ -473,7 +473,7 @@
+ 
+ 	def tell(self):
+ 		if self.closed:
+-			raise ValueError, "file is closed"
++			raise ValueError("file is closed")
+ 		return self._pos
+ 
+ 	def __enter__(self):
+@@ -512,7 +512,7 @@
+ 		self.f.write(pack_dirent(ent),
+ 			     _set_modified = set_modified)
+ 
+-	def next(self):
++	def __next__(self):
+ 		# print "@@@ next", self.tell(), self.f.name
+ 		dirent = self.f.read(PS2MC_DIRENT_LENGTH)
+ 		if dirent == "":
+@@ -617,7 +617,7 @@
+ 		s = f.read(0x154)
+ 		if len(s) != 0x154 or not s.startswith(PS2MC_MAGIC):
+ 			if (params == None):
+-				raise corrupt, ("Not a PS2 memory card image",
++				raise corrupt("Not a PS2 memory card image",
+ 						f)
+ 			self.f = f
+ 			self.format(params)
+@@ -658,7 +658,7 @@
+ 		root.close()
+ 		if (dot[8] != "." or dotdot[8] != ".."
+ 		    or not mode_is_dir(dot[0]) or not mode_is_dir(dotdot[0])):
+-			raise corrupt, "Root directory damaged."
++			raise corrupt("Root directory damaged.")
+ 		
+ 		self.fat_cursor = 0
+ 		self.curdir = (0, 0)
+@@ -699,7 +699,7 @@
+ 		 pages_per_erase_block, param_pages_per_card) = params
+ 
+ 		if pages_per_erase_block < 1:
+-			raise error, ("invalid pages per erase block (%d)"
++			raise error("invalid pages per erase block (%d)"
+ 				      % page_size)
+ 			
+ 		pages_per_card = round_down(param_pages_per_card,
+@@ -715,7 +715,7 @@
+ 		if (page_size < PS2MC_DIRENT_LENGTH
+ 		    or pages_per_cluster < 1
+ 		    or pages_per_cluster * page_size != cluster_size):
+-			raise error, "invalid page size (%d)" % page_size
++			raise error("invalid page size (%d)" % page_size)
+ 		
+ 		good_block1 = erase_blocks_per_card - 1
+ 		good_block2 = erase_blocks_per_card - 2
+@@ -737,7 +737,7 @@
+ 					   * clusters_per_erase_block
+ 					   - allocatable_cluster_offset)
+ 		if allocatable_cluster_end < 1:
+-			raise error, ("memory card image too small"
++			raise error("memory card image too small"
+ 				      " to be formatted")
+ 
+ 		ifc_list = unpack_fat("\0\0\0\0"
+@@ -780,7 +780,7 @@
+ 		remainder = fat_clusters % epc
+ 		for i in range(indirect_fat_clusters):
+ 			base = first_fat_cluster + i * epc
+-			buf = unpack_fat(range(base, base + epc))
++			buf = unpack_fat(list(range(base, base + epc)))
+ 			if (i == indirect_fat_clusters - 1
+ 			    and remainder != 0):
+ 				del buf[remainder:]
+@@ -819,17 +819,17 @@
+ 		f.seek(self.raw_page_size * n)
+ 		page = f.read(self.page_size)
+ 		if len(page) != self.page_size:
+-			raise corrupt, ("attempted to read past EOF"
++			raise corrupt("attempted to read past EOF"
+ 					" (page %05X)" % n, f)
+ 		if self.ignore_ecc:
+ 			return page
+ 		spare = f.read(self.spare_size)
+ 		if len(spare) != self.spare_size:
+-			raise corrupt, ("attempted to read past EOF"
++			raise corrupt("attempted to read past EOF"
+ 					" (page %05X)" % n, f)
+ 		(status, page, spare) = ecc_check_page(page, spare)
+ 		if status == ECC_CHECK_FAILED:
+-			raise ecc_error, ("Unrecoverable ECC error (page %d)"
++			raise ecc_error("Unrecoverable ECC error (page %d)"
+ 					  % n)
+ 		return page
+ 
+@@ -838,7 +838,7 @@
+ 		f.seek(self.raw_page_size * n)
+ 		self.modified = True
+ 		if len(buf) != self.page_size:
+-			raise error, ("internal error: write_page:"
++			raise error("internal error: write_page:"
+ 				      " %d != %d" % (len(buf), self.page_size))
+ 		f.write(buf)
+ 		if self.spare_size != 0:
+@@ -858,7 +858,7 @@
+ 		if pages_per_cluster == 2:
+ 			return self.read_page(n) + self.read_page(n + 1)
+ 		return "".join(map(self.read_page,
+-				   range(n, n + pages_per_cluster)))
++				   list(range(n, n + pages_per_cluster))))
+ 
+ 	def write_cluster(self, n, buf):
+ 		pages_per_cluster = self.pages_per_cluster
+@@ -866,7 +866,7 @@
+ 		if self.spare_size == 0:
+ 			self.f.seek(cluster_size * n)
+ 			if len(buf) != cluster_size:
+-				raise error, ("internal error: write_cluster:"
++				raise error("internal error: write_cluster:"
+ 					      " %d != %d" % (len(buf),
+ 							     cluster_size))
+ 			return self.f.write(buf)
+@@ -900,7 +900,7 @@
+ 	def flush_fat_cache(self):
+ 		if self.fat_cache == None:
+ 			return
+-		for (n, v) in self.fat_cache.items():
++		for (n, v) in list(self.fat_cache.items()):
+ 			[fat, dirty] = v
+ 			if dirty:
+ 				self.write_cluster(n, pack_fat(fat))
+@@ -930,7 +930,7 @@
+ 	def flush_alloc_cluster_cache(self):
+ 		if self.alloc_cluster_cache == None:
+ 			return
+-		for (n, a) in self.alloc_cluster_cache.items():
++		for (n, a) in list(self.alloc_cluster_cache.items()):
+ 			[buf, dirty] = a
+ 			if dirty:
+ 				n += self.allocatable_cluster_offset
+@@ -947,7 +947,7 @@
+ 					      
+ 	def read_fat(self, n):
+ 		if n < 0 or n >= self.allocatable_cluster_end:
+-			raise io_error, (EIO,
++			raise io_error(EIO,
+ 					 "FAT cluster index out of range"
+ 					 " (%d)" % n)
+ 		offset = n % self.entries_per_cluster
+@@ -1148,7 +1148,7 @@
+ 		start = dir.tell() - 1
+ 		if start == -1:
+ 			start = 0
+-		for i in range(start, len(dir)) + range(0, start):
++		for i in list(range(start, len(dir))) + list(range(0, start)):
+ 			try:
+ 				ent = dir[i]
+ 			except IndexError:
+@@ -1162,7 +1162,7 @@
+ 		"""Create a new directory entry in a directory."""
+ 
+ 		if name == "":
+-			raise file_not_found, name
++			raise file_not_found(name)
+ 		
+ 		# print "@@@ create_dir_ent", parent_dirloc, name
+ 		dir_ent = self._dirloc_to_ent(parent_dirloc)
+@@ -1226,16 +1226,16 @@
+ 		"""Delete or truncate the file or directory given by dirloc."""
+ 		
+ 		if dirloc == (0, 0):
+-			raise io_error, (EACCES,
++			raise io_error(EACCES,
+ 					 "cannot remove root directory",
+ 					 name)
+ 		if dirloc[1] in [0, 1]:
+-			raise io_error, (EACCES,
++			raise io_error(EACCES,
+ 					 'cannot remove "." or ".." entries',
+ 					 name)
+ 
+ 		if dirloc in self.open_files:
+-			raise io_error, (EBUSY,
++			raise io_error(EBUSY,
+ 					 "cannot remove open file", filename)
+ 
+ 		epc = self.entries_per_cluster
+@@ -1351,13 +1351,13 @@
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		# print "@@@ open", (dirloc, ent)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if is_dir:
+-			raise io_error, (EISDIR, "not a regular file",
++			raise io_error(EISDIR, "not a regular file",
+ 					 filename)
+ 		if ent[0] == 0:
+ 			if mode[0] not in "wa":
+-				raise file_not_found, filename
++				raise file_not_found(filename)
+ 			name = ent[8]
+ 			(dirloc, ent) = self.create_dir_entry(dirloc, name,
+ 							      DF_FILE | DF_RWX
+@@ -1372,19 +1372,19 @@
+ 	def dir_open(self, filename, mode = "rb"):
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if ent[0] == 0:
+-			raise dir_not_found, filename
++			raise dir_not_found(filename)
+ 		if not is_dir:
+-			raise io_error, (ENOTDIR, "not a directory", filename)
++			raise io_error(ENOTDIR, "not a directory", filename)
+ 		return self.directory(dirloc, ent[4], ent[2], mode, filename)
+ 
+ 	def mkdir(self, filename):
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if ent[0] != 0:
+-			raise io_error, (EEXIST, "directory exists", filename)
++			raise io_error(EEXIST, "directory exists", filename)
+ 		name = ent[8]
+ 		self.create_dir_entry(dirloc, name, DF_DIR | DF_RWX | DF_0400)
+ 		self.flush()
+@@ -1407,16 +1407,16 @@
+ 		
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if ent[0] == 0:
+-			raise file_not_found, filename
++			raise file_not_found(filename)
+ 		if is_dir:
+ 			if ent[4] == 0:
+-				raise io_error, (EACCES,
++				raise io_error(EACCES,
+ 						 "cannot remove"
+ 						 " root directory")
+ 			if not self._is_empty(dirloc, ent, filename):
+-				raise io_error, (ENOTEMPTY,
++				raise io_error(ENOTEMPTY,
+ 						 "directory not empty",
+ 						 filename)
+ 		self.delete_dirloc(dirloc, False, filename)
+@@ -1425,11 +1425,11 @@
+ 	def chdir(self, filename):
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if ent[0] == 0:
+-			raise dir_not_found, filename
++			raise dir_not_found(filename)
+ 		if not is_dir:
+-			raise io_error, (ENOTDIR, "not a directory", filename)
++			raise io_error(ENOTDIR, "not a directory", filename)
+ 		self.curdir = dirloc
+ 
+ 	def get_mode(self, filename):
+@@ -1448,9 +1448,9 @@
+ 		
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if ent[0] == 0:
+-			raise file_not_found, filename
++			raise file_not_found(filename)
+ 		return ent
+ 
+ 	def set_dirent(self, filename, new_ent):
+@@ -1461,9 +1461,9 @@
+ 		
+ 		(dirloc, ent, is_dir) = self.path_search(filename)
+ 		if dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if ent[0] == 0:
+-			raise file_not_found, filename
++			raise file_not_found(filename)
+ 		dir = self._opendir_parent_dirloc(dirloc, "r+b")
+ 		try:
+ 			new_ent = list(new_ent)
+@@ -1485,23 +1485,23 @@
+ 	def rename(self, oldpathname, newpathname):
+ 		(olddirloc, oldent, is_dir) = self.path_search(oldpathname)
+ 		if olddirloc == None:
+-			raise path_not_found, oldpathname
++			raise path_not_found(oldpathname)
+ 		if oldent[0] == 0:
+-			raise file_not_found, oldpathname
++			raise file_not_found(oldpathname)
+ 
+ 		if olddirloc == (0, 0):
+-			raise io_error, (EINVAL,
++			raise io_error(EINVAL,
+ 					 "cannot rename root directory",
+ 					 oldpathname)
+ 		if olddirloc in self.open_files:
+-			raise io_error, (EBUSY, "cannot rename open file",
++			raise io_error(EBUSY, "cannot rename open file",
+ 					 newname)
+ 		
+ 		(newparentdirloc, newent, x) = self.path_search(newpathname)
+ 		if newparentdirloc == None:
+-			raise path_not_found, newpathname
++			raise path_not_found(newpathname)
+ 		if newent[0] != 0:
+-			raise io_error, (EEXIST, "file exists", newpathname)
++			raise io_error(EEXIST, "file exists", newpathname)
+ 		newname = newent[8]
+ 
+ 		oldparentdirloc = self._get_parent_dirloc(olddirloc)
+@@ -1516,7 +1516,7 @@
+ 			return
+ 
+ 		if is_dir and self.is_ancestor(newparentdirloc, olddirloc):
+-			raise io_error, (EINVAL, "cannot move directory"
++			raise io_error(EINVAL, "cannot move directory"
+ 					 " beneath itself", oldpathname)
+ 			
+ 
+@@ -1573,11 +1573,11 @@
+ 
+ 		(root_dirloc, ent, is_dir) = self.path_search(dirname)
+ 		if root_dirloc == None:
+-			raise path_not_found, dirname
++			raise path_not_found(dirname)
+ 		if ent[0] != 0:
+ 			if ignore_existing:
+ 				return False
+-			raise io_error, (EEXIST, "directory exists", dirname)
++			raise io_error(EEXIST, "directory exists", dirname)
+ 		name = ent[8]
+ 		mode = DF_DIR | (dir_ent[0] & ~DF_FILE)
+ 
+@@ -1607,17 +1607,17 @@
+ 						(ent, data) = sf.get_file(i)
+ 						# print "@@@ remove", ent[8]
+ 						self.remove(dirname + ent[8])
+-				except EnvironmentError, why:
++				except EnvironmentError as why:
+ 					# print "@@@ failed", why
+ 					pass
+ 			
+ 				try:
+ 					# print "@@@ remove dir", dirname
+ 					self.remove(dirname)
+-				except EnvironmentError, why:
++				except EnvironmentError as why:
+ 					# print "@@@ failed", why
+ 					pass
+-				raise type, what, where
++				raise type(what).with_traceback(where)
+ 			finally:
+ 				del where
+ 
+@@ -1644,13 +1644,13 @@
+ 	def export_save_file(self, filename):
+ 		(dir_dirloc, dirent, is_dir) = self.path_search(filename)
+ 		if dir_dirloc == None:
+-			raise path_not_found, filename
++			raise path_not_found(filename)
+ 		if dirent[0] == 0:
+-			raise dir_not_found, filename
++			raise dir_not_found(filename)
+ 		if not is_dir:
+-			raise io_error, (ENOTDIR, "not a directory", filename)
++			raise io_error(ENOTDIR, "not a directory", filename)
+ 		if dir_dirloc == (0, 0):
+-			raise io_error, (EACCES, "can't export root directory",
++			raise io_error(EACCES, "can't export root directory",
+ 					 filename)
+ 		sf = ps2save.ps2_save_file()
+ 		files = []
+@@ -1661,9 +1661,9 @@
+ 			for i in range(2, dirent[2]):
+ 				ent = dir[i]
+ 				if not mode_is_file(ent[0]):
+-					print ("warning: %s/%s is not a file,"
++					print(("warning: %s/%s is not a file,"
+ 					       " ingored."
+-					       % (dirent[8], ent[8]))
++					       % (dirent[8], ent[8])))
+ 					continue
+ 				f = self.file((dirent[4], i), ent[4], ent[2],
+ 					      "rb")
+@@ -1711,13 +1711,13 @@
+ 		
+ 		(dirloc, ent, is_dir) = self.path_search(dirname)
+ 		if dirloc == None:
+-			raise path_not_found, dirname
++			raise path_not_found(dirname)
+ 		if ent[0] == 0:
+-			raise dir_not_found, dirname
++			raise dir_not_found(dirname)
+ 		if not is_dir:
+-			raise io_error, (ENOTDIR, "not a directory", dirname)
++			raise io_error(ENOTDIR, "not a directory", dirname)
+ 		if dirloc == (0, 0):
+-			raise io_error, (EACCES, "can't delete root directory",
++			raise io_error(EACCES, "can't delete root directory",
+ 					 dirname)
+ 
+ 		if dirname != "" and dirname[-1] != "/":
+@@ -1728,7 +1728,7 @@
+ 		"""Returns the amount of free space in bytes."""
+ 		
+ 		free = 0
+-		for i in xrange(self.allocatable_cluster_end):
++		for i in range(self.allocatable_cluster_end):
+ 			if (self.lookup_fat(i) & PS2MC_FAT_ALLOCATED_BIT) == 0:
+ 				free += 1
+ 		return free * self.cluster_size
+@@ -1765,7 +1765,7 @@
+ 		why = self._check_file(fat, ent[4],
+ 				       ent[2] * PS2MC_DIRENT_LENGTH)
+ 		if why != None:
+-			print "bad directory:", dirname + ":", why
++			print("bad directory:", dirname + ":", why)
+ 			return False
+ 		ret = True
+ 		first_cluster = ent[4]
+@@ -1774,16 +1774,16 @@
+ 				      "rb", dirname)
+ 		dot_ent = dir[0]
+ 		if dot_ent[8] != ".":
+-			print "bad directory:", dirname + ': missing "." entry'
++			print("bad directory:", dirname + ': missing "." entry')
+ 			ret = False
+ 		if (dot_ent[4], dot_ent[5]) != dirloc:
+-			print "bad directory:", dirname + ': bad "." entry'
++			print("bad directory:", dirname + ': bad "." entry')
+ 			ret = False
+ 		if dir[1][8] != "..":
+-			print "bad directory:", (dirname
+-						 + ': missing ".." entry')
++			print("bad directory:", (dirname
++						 + ': missing ".." entry'))
+ 			ret = False
+-		for i in xrange(2, length):
++		for i in range(2, length):
+ 			ent = dir[i]
+ 			mode = ent[0]
+ 			if not (mode & DF_EXISTS):
+@@ -1796,8 +1796,8 @@
+ 			else:
+ 				why = self._check_file(fat, ent[4], ent[2])
+ 				if why != None:
+-					print "bad file:", (dirname + ent[8]
+-							    + ":"), why
++					print("bad file:", (dirname + ent[8]
++							    + ":"), why)
+ 					ret = False
+ 				
+ 		dir.close()
+@@ -1812,7 +1812,7 @@
+ 
+ 		fat_len = int(str(self.allocatable_cluster_end)) 
+ 		if not isinstance(fat_len, int):
+-			raise error, "Memory card image too big to check."
++			raise error("Memory card image too big to check.")
+ 
+ 		fat = array.array('B', [0]) * fat_len
+ 
+@@ -1821,14 +1821,14 @@
+ 		ret = self._check_dir(fat, (0, 0), "/", ent)
+ 
+ 		lost_clusters = 0
+-		for i in xrange(self.allocatable_cluster_end):
++		for i in range(self.allocatable_cluster_end):
+ 			a = self.lookup_fat(i)
+ 			if (a & PS2MC_FAT_ALLOCATED_BIT) and not fat[i]:
+-				print i,
++				print(i, end=' ')
+ 				lost_clusters += 1
+ 		if lost_clusters > 0:
+-			print
+-			print "found", lost_clusters, "lost clusters"
++			print()
++			print("found", lost_clusters, "lost clusters")
+ 			ret = False
+ 			
+ 		return ret
+@@ -1958,7 +1958,7 @@
+ 				# this is complicated by the fact as
+ 				# files are closed they will remove
+ 				# themselves from the list of open files
+-				for (dir, files) in open_files.values():
++				for (dir, files) in list(open_files.values()):
+ 					for f in list(files):
+ 						f.close()
+ 				while len(open_files) > 0:
+RefactoringTool: Refactored ps2save.py
+--- ps2save.py	(original)
++++ ps2save.py	(refactored)
+@@ -95,75 +95,75 @@
+ # as substitutes for Unicode characters.
+ #
+ char_substs = {
+-	u'\u00a2': u"c",
+-	u'\u00b4': u"'",
+-	u'\u00d7': u"x",
+-	u'\u00f7': u"/",
+-	u'\u2010': u"-",
+-	u'\u2015': u"-",
+-	u'\u2018': u"'",
+-	u'\u2019': u"'",
+-	u'\u201c': u'"',
+-	u'\u201d': u'"',
+-	u'\u2032': u"'",
+-	u'\u2212': u"-",
+-	u'\u226a': u"<<",
+-	u'\u226b': u">>",
+-	u'\u2500': u"-",
+-	u'\u2501': u"-",
+-	u'\u2502': u"|",
+-	u'\u2503': u"|",
+-	u'\u250c': u"+",
+-	u'\u250f': u"+",
+-	u'\u2510': u"+",
+-	u'\u2513': u"+",
+-	u'\u2514': u"+",
+-	u'\u2517': u"+",
+-	u'\u2518': u"+",
+-	u'\u251b': u"+",
+-	u'\u251c': u"+",
+-	u'\u251d': u"+",
+-	u'\u2520': u"+",
+-	u'\u2523': u"+",
+-	u'\u2524': u"+",
+-	u'\u2525': u"+",
+-	u'\u2528': u"+",
+-	u'\u252b': u"+",
+-	u'\u252c': u"+",
+-	u'\u252f': u"+",
+-	u'\u2530': u"+",
+-	u'\u2533': u"+",
+-	u'\u2537': u"+",
+-	u'\u2538': u"+",
+-	u'\u253b': u"+",
+-	u'\u253c': u"+",
+-	u'\u253f': u"+",
+-	u'\u2542': u"+",
+-	u'\u254b': u"+",
+-	u'\u25a0': u"#",
+-	u'\u25a1': u"#",
+-	u'\u2605': u"*",
+-	u'\u2606': u"*",
+-	u'\u3001': u",",
+-	u'\u3002': u".",
+-	u'\u3003': u'"',
+-	u'\u3007': u'0',
+-	u'\u3008': u'<',
+-	u'\u3009': u'>',
+-	u'\u300a': u'<<',
+-	u'\u300b': u'>>',
+-	u'\u300a': u'<<',
+-	u'\u300b': u'>>',
+-	u'\u300c': u'[',
+-	u'\u300d': u']',
+-	u'\u300e': u'[',
+-	u'\u300f': u']',
+-	u'\u3010': u'[',
+-	u'\u3011': u']',
+-	u'\u3014': u'[',
+-	u'\u3015': u']',
+-	u'\u301c': u'~',
+-	u'\u30fc': u'-',
++	'\u00a2': "c",
++	'\u00b4': "'",
++	'\u00d7': "x",
++	'\u00f7': "/",
++	'\u2010': "-",
++	'\u2015': "-",
++	'\u2018': "'",
++	'\u2019': "'",
++	'\u201c': '"',
++	'\u201d': '"',
++	'\u2032': "'",
++	'\u2212': "-",
++	'\u226a': "<<",
++	'\u226b': ">>",
++	'\u2500': "-",
++	'\u2501': "-",
++	'\u2502': "|",
++	'\u2503': "|",
++	'\u250c': "+",
++	'\u250f': "+",
++	'\u2510': "+",
++	'\u2513': "+",
++	'\u2514': "+",
++	'\u2517': "+",
++	'\u2518': "+",
++	'\u251b': "+",
++	'\u251c': "+",
++	'\u251d': "+",
++	'\u2520': "+",
++	'\u2523': "+",
++	'\u2524': "+",
++	'\u2525': "+",
++	'\u2528': "+",
++	'\u252b': "+",
++	'\u252c': "+",
++	'\u252f': "+",
++	'\u2530': "+",
++	'\u2533': "+",
++	'\u2537': "+",
++	'\u2538': "+",
++	'\u253b': "+",
++	'\u253c': "+",
++	'\u253f': "+",
++	'\u2542': "+",
++	'\u254b': "+",
++	'\u25a0': "#",
++	'\u25a1': "#",
++	'\u2605': "*",
++	'\u2606': "*",
++	'\u3001': ",",
++	'\u3002': ".",
++	'\u3003': '"',
++	'\u3007': '0',
++	'\u3008': '<',
++	'\u3009': '>',
++	'\u300a': '<<',
++	'\u300b': '>>',
++	'\u300a': '<<',
++	'\u300b': '>>',
++	'\u300c': '[',
++	'\u300d': ']',
++	'\u300e': '[',
++	'\u300f': ']',
++	'\u3010': '[',
++	'\u3011': ']',
++	'\u3014': '[',
++	'\u3015': ']',
++	'\u301c': '~',
++	'\u30fc': '-',
+ }
+ 
+ def shift_jis_conv(src, encoding = None):
+@@ -191,7 +191,7 @@
+ 			for uc2 in shift_jis_normalize_table.get(uc, uc):
+ 				a.append(char_substs.get(uc2, uc2))
+ 	
+-	return u"".join(a).encode(encoding, "replace")
++	return "".join(a).encode(encoding, "replace")
+ 
+ def rc4_crypt(s, t):
+ 	"""RC4 encrypt/decrypt the string t using the permutation s.
+@@ -228,7 +228,7 @@
+ 	a = list(a)
+ 	for i in range(3, 7):
+ 		a[i] = struct.unpack("<4L", a[i])
+-		a[i] = map(hex, a[i])
++		a[i] = list(map(hex, a[i]))
+ 	for i in range(7, 14):
+ 		a[i] = struct.unpack("<4f", a[i])
+ 	a[14] = zero_terminate(a[14])
+@@ -251,7 +251,7 @@
+ 	
+ 	s = f.read(n)
+ 	if len(s) != n:
+-		raise eof, f
++		raise eof(f)
+ 	return s
+ 
+ def _read_long_string(f):
+@@ -314,7 +314,7 @@
+ 		    or not mode_is_dir(dotent[0])
+ 		    or not mode_is_dir(dotdotent[0])
+ 		    or dirent[2] < 2):
+-			raise corrupt, ("Not a EMS (.psu) save file.", f)
++			raise corrupt("Not a EMS (.psu) save file.", f)
+ 
+ 		dirent[2] -= 2
+ 		self.set_directory(dirent)
+@@ -323,7 +323,7 @@
+ 			ent = unpack_dirent(_read_fixed(f,
+ 							PS2MC_DIRENT_LENGTH))
+ 			if not mode_is_file(ent[0]):
+-				raise subdir, f
++				raise subdir(f)
+ 			flen = ent[2]
+ 			self.set_file(i, ent, _read_fixed(f, flen))
+ 			_read_fixed(f, round_up(flen, cluster_size) - flen)
+@@ -348,7 +348,7 @@
+ 			if not mode_is_file(ent[0]):
+ 				# print ent
+ 				# print hex(ent[0])
+-				raise error, "Directory has a subdirectory."
++				raise error("Directory has a subdirectory.")
+ 			f.write(data)
+ 			f.write("\0" * (round_up(len(data), cluster_size)
+ 					- len(data)))
+@@ -359,7 +359,7 @@
+ 		self._compressed = None
+ 		
+ 		if lzari == None:
+-			raise error, ("The lzari module is needed to "
++			raise error("The lzari module is needed to "
+ 				      " decompress MAX Drive saves.")
+ 		s = lzari.decode(s, length,
+ 				 "decompressing " + self.dirent[8] + ": ")
+@@ -368,14 +368,14 @@
+ 		off = 0
+ 		for i in range(dirlen):
+ 			if len(s) - off < 36:
+-				raise eof, f
++				raise eof(f)
+ 			(l, name) = struct.unpack("<L32s", s[off : off + 36])
+ 			name = zero_terminate(name)
+ 			# print "%08x %08x %s" % (off, l, name)
+ 			off += 36
+ 			data = s[off : off + l]
+ 			if len(data) != l:
+-				raise eof, f
++				raise eof(f)
+ 			self.set_file(i,
+ 				      (DF_RWX | DF_FILE | DF_0400 | DF_EXISTS,
+ 				       0, l, timestamp, 0, 0, timestamp, 0,
+@@ -391,7 +391,7 @@
+ 			(magic, crc, dirname, iconsysname, clen, dirlen,
+ 			 length) = struct.unpack("<12sL32s32sLLL", s)
+ 		if magic != PS2SAVE_MAX_MAGIC:
+-			raise corrupt, ("Not a MAX Drive save file", f)
++			raise corrupt("Not a MAX Drive save file", f)
+ 		if clen == length:
+ 			# some saves have the uncompressed size here
+ 			# instead of the compressed size
+@@ -409,7 +409,7 @@
+ 		
+ 	def save_max_drive(self, f):
+ 		if lzari == None:
+-			raise error, ("The lzari module is needed to "
++			raise error("The lzari module is needed to "
+ 				      " decompress MAX Drive saves.")
+ 		iconsysname = ""
+ 		icon_sys = self.get_icon_sys()
+@@ -424,7 +424,7 @@
+ 		for i in range(dirent[2]):
+ 			(ent, data) = self.get_file(i)
+ 			if not mode_is_file(ent[0]):
+-				raise error, "Non-file in save file."
++				raise error("Non-file in save file.")
+ 			s += struct.pack("<L32s", ent[2], ent[8])
+ 			s += data
+ 			s += "\0" * (round_up(len(s) + 8, 16) - 8 - len(s))
+@@ -445,10 +445,10 @@
+ 	def load_codebreaker(self, f):
+ 		magic = f.read(4)
+ 		if magic != PS2SAVE_CBS_MAGIC:
+-			raise corrupt, ("Not a Codebreaker save file.", f)
++			raise corrupt("Not a Codebreaker save file.", f)
+ 		(d04, hlen) = struct.unpack("<LL", _read_fixed(f, 8))
+ 		if hlen < 92 + 32:
+-			raise corrupt, ("Header lengh too short.", f)
++			raise corrupt("Header lengh too short.", f)
+ 		(dlen, flen, dirname, created, modified, d44, d48, dirmode,
+ 		 d50, d54, d58, title) \
+ 		       = struct.unpack("<LL32s8s8sLLLLLL%ds" % (hlen - 92),
+@@ -471,7 +471,7 @@
+ 		body = f.read(flen)
+ 		clen = len(body)
+ 		if clen != flen and clen != flen - hlen:
+-			raise eof, f
++			raise eof(f)
+ 		body = rc4_crypt(PS2SAVE_CBS_RC4S, body)
+ 		dcobj = zlib.decompressobj()
+ 		body = dcobj.decompress(body, dlen)
+@@ -479,12 +479,12 @@
+ 		files = []
+ 		while body != "":
+ 			if len(body) < 64:
+-				raise eof, f
++				raise eof(f)
+ 			header = struct.unpack("<8s8sLHHLL32s", body[:64])
+ 			size = header[2]
+ 			data = body[64 : 64 + size]
+ 			if len(data) != size:
+-				raise eof, f
++				raise eof(f)
+ 			body = body[64 + size:]
+ 			files.append((header, data))
+ 			
+@@ -498,7 +498,7 @@
+ 			created = unpack_tod(created)
+ 			modified = unpack_tod(modified)
+ 			if not mode_is_file(mode):
+-				raise subdir, f
++				raise subdir(f)
+ 			if tod_to_time(created) == 0:
+ 				created = tod_now()
+ 			if tod_to_time(modified) == 0:
+@@ -509,7 +509,7 @@
+ 	def load_sharkport(self, f):
+ 		magic = f.read(17)
+ 		if magic != PS2SAVE_SPS_MAGIC:
+-			raise corrupt, ("Not a SharkPort/X-Port save file.", f)
++			raise corrupt("Not a SharkPort/X-Port save file.", f)
+ 		(savetype,) = struct.unpack("<L", _read_fixed(f, 4))
+ 		dirname = _read_long_string(f)
+ 		datestamp = _read_long_string(f)
+@@ -529,7 +529,7 @@
+ 		dirmode = dirmode / 256 % 256 + dirmode % 256 * 256
+ 		dirlen -= 2
+ 		if not mode_is_dir(dirmode) or dirlen < 0:
+-			raise corrupt, ("Bad values in directory entry.", f)
++			raise corrupt("Bad values in directory entry.", f)
+ 		self.set_directory((dirmode, 0, dirlen, created, 0, 0,
+ 				    modified, 0, dirname))
+ 
+@@ -538,14 +538,14 @@
+ 			       = struct.unpack("<H64sL8xH2x8s8s",
+ 					       _read_fixed(f, 98))
+ 			if hlen < 98:
+-				raise corrupt, ("Header length too short.", f)
++				raise corrupt("Header length too short.", f)
+ 			_read_fixed(f, hlen - 98)
+ 			name = zero_terminate(name)
+ 			created = unpack_tod(created)
+ 			modified = unpack_tod(modified)
+ 			mode = mode / 256 % 256 + mode % 256 * 256
+ 			if not mode_is_file(mode):
+-				raise subdir, f
++				raise subdir(f)
+ 			self.set_file(i, (mode, 0, flen, created, 0, 0,
+ 					  modified, 0, name),
+ 				      _read_fixed(f, flen))
+@@ -586,8 +586,8 @@
+ #
+ # Set up tables of illegal and problematic characters in file names.
+ #
+-_bad_filename_chars = ("".join(map(chr, range(32)))
+-		       + "".join(map(chr, range(127, 256))))
++_bad_filename_chars = ("".join(map(chr, list(range(32))))
++		       + "".join(map(chr, list(range(127, 256)))))
+ _bad_filename_repl = "_" * len(_bad_filename_chars)
+ 
+ if os.name in ["nt", "os2", "ce"]:
+RefactoringTool: No changes to round.py
+RefactoringTool: Refactored sjistab.py
+--- sjistab.py	(original)
++++ sjistab.py	(refactored)
+@@ -1,2 +1,2 @@
+ # automatically generated
+-shift_jis_normalize_table = {u'\uff81': u'\u30c1', u'\u3000': u' ', u'\uff85': u'\u30ca', u'\uff06': u'&', u'\uff89': u'\u30ce', u'\uff0a': u'*', u'\uff8d': u'\u30d8', u'\uff0e': u'.', u'\uff91': u'\u30e0', u'\uff12': u'2', u'\uff95': u'\u30e6', u'\uff16': u'6', u'\uff99': u'\u30eb', u'\u309b': u' \u3099', u'\uff1a': u':', u'\uff9d': u'\u30f3', u'\uff03': u'#', u'\uff1e': u'>', u'\uff22': u'B', u'\uff26': u'F', u'\uff2a': u'J', u'\u222c': u'\u222b\u222b', u'\uff2e': u'N', u'\uff32': u'R', u'\uff36': u'V', u'\uff3a': u'Z', u'\uff3e': u'^', u'\uff42': u'b', u'\uff46': u'f', u'\uff4a': u'j', u'\uff4e': u'n', u'\uff52': u'r', u'\uff56': u'v', u'\uff5a': u'z', u'\uff62': u'\u300c', u'\uffe5': u'\xa5', u'\uff66': u'\u30f2', u'\uff6a': u'\u30a7', u'\uff6e': u'\u30e7', u'\uff72': u'\u30a4', u'\uff76': u'\u30ab', u'\uff7a': u'\u30b3', u'\uff7e': u'\u30bb', u'\uff01': u'!', u'\uff82': u'\u30c4', u'\uff05': u'%', u'\uff86': u'\u30cb', u'\uff09': u')', u'\uff8a': u'\u30cf', u'\uff8e': u'\u30db', u'\uff11': u'1', u'\uff92': u'\u30e1', u'\uff15': u'5', u'\uff96': u'\u30e8', u'\uff19': u'9', u'\uff9a': u'\u30ec', u'\uff1d': u'=', u'\u309c': u' \u309a', u'\uff9e': u'\u3099', u'\uff21': u'A', u'\uff25': u'E', u'\uff29': u'I', u'\xa8': u' \u0308', u'\uff2d': u'M', u'\uff31': u'Q', u'\u2033': u'\u2032\u2032', u'\uff35': u'U', u'\xb4': u' \u0301', u'\uff39': u'Y', u'\uff3d': u']', u'\uff41': u'a', u'\uff45': u'e', u'\uff49': u'i', u'\uff4d': u'm', u'\uff51': u'q', u'\uff55': u'u', u'\uff59': u'y', u'\uff5d': u'}', u'\uff61': u'\u3002', u'\uff65': u'\u30fb', u'\uff69': u'\u30a5', u'\uff6d': u'\u30e5', u'\uff71': u'\u30a2', u'\uff75': u'\u30aa', u'\uff79': u'\u30b1', u'\uff7d': u'\u30b9', u'\uff83': u'\u30c6', u'\uff04': u'$', u'\uff87': u'\u30cc', u'\uff08': u'(', u'\uff8b': u'\u30d2', u'\uff0c': u',', u'\uff8f': u'\u30de', u'\uff10': u'0', u'\uff93': u'\u30e2', u'\uff14': u'4', u'\uff97': u'\u30e9', u'\uff18': u'8', u'\uff9b': u'\u30ed', u'\uff1c': u'<', u'\uff9f': u'\u309a', u'\uff20': u'@', u'\uff24': u'D', u'\u2026': u'...', u'\uff28': u'H', u'\uff2c': u'L', u'\uff30': u'P', u'\uff34': u'T', u'\uff38': u'X', u'\uff3c': u'\\', u'\uff40': u'`', u'\uff44': u'd', u'\uff48': u'h', u'\uff4c': u'l', u'\uff50': u'p', u'\uff54': u't', u'\uff58': u'x', u'\uff5c': u'|', u'\uffe3': u' \u0304', u'\uff64': u'\u3001', u'\uff68': u'\u30a3', u'\uff6c': u'\u30e3', u'\uff70': u'\u30fc', u'\uff74': u'\u30a8', u'\uff78': u'\u30af', u'\uff7c': u'\u30b7', u'\uff80': u'\u30bf', u'\u2103': u'\xb0C', u'\uff84': u'\u30c8', u'\uff88': u'\u30cd', u'\uff0b': u'+', u'\uff8c': u'\u30d5', u'\uff0f': u'/', u'\uff90': u'\u30df', u'\uff13': u'3', u'\uff94': u'\u30e4', u'\uff17': u'7', u'\uff98': u'\u30ea', u'\uff1b': u';', u'\uff9c': u'\u30ef', u'\uff1f': u'?', u'\uff23': u'C', u'\u2025': u'..', u'\uff27': u'G', u'\u212b': u'\xc5', u'\uff2f': u'O', u'\uff33': u'S', u'\uff37': u'W', u'\uff3b': u'[', u'\uff3f': u'_', u'\uff43': u'c', u'\uff47': u'g', u'\uff4b': u'k', u'\uff4f': u'o', u'\uff53': u's', u'\uff57': u'w', u'\uff5b': u'{', u'\uff63': u'\u300d', u'\uff67': u'\u30a1', u'\uff6b': u'\u30a9', u'\uff6f': u'\u30c3', u'\uff73': u'\u30a6', u'\uff77': u'\u30ad', u'\uff7b': u'\u30b5', u'\uff2b': u'K', u'\uff7f': u'\u30bd'}
++shift_jis_normalize_table = {'\uff81': '\u30c1', '\u3000': ' ', '\uff85': '\u30ca', '\uff06': '&', '\uff89': '\u30ce', '\uff0a': '*', '\uff8d': '\u30d8', '\uff0e': '.', '\uff91': '\u30e0', '\uff12': '2', '\uff95': '\u30e6', '\uff16': '6', '\uff99': '\u30eb', '\u309b': ' \u3099', '\uff1a': ':', '\uff9d': '\u30f3', '\uff03': '#', '\uff1e': '>', '\uff22': 'B', '\uff26': 'F', '\uff2a': 'J', '\u222c': '\u222b\u222b', '\uff2e': 'N', '\uff32': 'R', '\uff36': 'V', '\uff3a': 'Z', '\uff3e': '^', '\uff42': 'b', '\uff46': 'f', '\uff4a': 'j', '\uff4e': 'n', '\uff52': 'r', '\uff56': 'v', '\uff5a': 'z', '\uff62': '\u300c', '\uffe5': '\xa5', '\uff66': '\u30f2', '\uff6a': '\u30a7', '\uff6e': '\u30e7', '\uff72': '\u30a4', '\uff76': '\u30ab', '\uff7a': '\u30b3', '\uff7e': '\u30bb', '\uff01': '!', '\uff82': '\u30c4', '\uff05': '%', '\uff86': '\u30cb', '\uff09': ')', '\uff8a': '\u30cf', '\uff8e': '\u30db', '\uff11': '1', '\uff92': '\u30e1', '\uff15': '5', '\uff96': '\u30e8', '\uff19': '9', '\uff9a': '\u30ec', '\uff1d': '=', '\u309c': ' \u309a', '\uff9e': '\u3099', '\uff21': 'A', '\uff25': 'E', '\uff29': 'I', '\xa8': ' \u0308', '\uff2d': 'M', '\uff31': 'Q', '\u2033': '\u2032\u2032', '\uff35': 'U', '\xb4': ' \u0301', '\uff39': 'Y', '\uff3d': ']', '\uff41': 'a', '\uff45': 'e', '\uff49': 'i', '\uff4d': 'm', '\uff51': 'q', '\uff55': 'u', '\uff59': 'y', '\uff5d': '}', '\uff61': '\u3002', '\uff65': '\u30fb', '\uff69': '\u30a5', '\uff6d': '\u30e5', '\uff71': '\u30a2', '\uff75': '\u30aa', '\uff79': '\u30b1', '\uff7d': '\u30b9', '\uff83': '\u30c6', '\uff04': '$', '\uff87': '\u30cc', '\uff08': '(', '\uff8b': '\u30d2', '\uff0c': ',', '\uff8f': '\u30de', '\uff10': '0', '\uff93': '\u30e2', '\uff14': '4', '\uff97': '\u30e9', '\uff18': '8', '\uff9b': '\u30ed', '\uff1c': '<', '\uff9f': '\u309a', '\uff20': '@', '\uff24': 'D', '\u2026': '...', '\uff28': 'H', '\uff2c': 'L', '\uff30': 'P', '\uff34': 'T', '\uff38': 'X', '\uff3c': '\\', '\uff40': '`', '\uff44': 'd', '\uff48': 'h', '\uff4c': 'l', '\uff50': 'p', '\uff54': 't', '\uff58': 'x', '\uff5c': '|', '\uffe3': ' \u0304', '\uff64': '\u3001', '\uff68': '\u30a3', '\uff6c': '\u30e3', '\uff70': '\u30fc', '\uff74': '\u30a8', '\uff78': '\u30af', '\uff7c': '\u30b7', '\uff80': '\u30bf', '\u2103': '\xb0C', '\uff84': '\u30c8', '\uff88': '\u30cd', '\uff0b': '+', '\uff8c': '\u30d5', '\uff0f': '/', '\uff90': '\u30df', '\uff13': '3', '\uff94': '\u30e4', '\uff17': '7', '\uff98': '\u30ea', '\uff1b': ';', '\uff9c': '\u30ef', '\uff1f': '?', '\uff23': 'C', '\u2025': '..', '\uff27': 'G', '\u212b': '\xc5', '\uff2f': 'O', '\uff33': 'S', '\uff37': 'W', '\uff3b': '[', '\uff3f': '_', '\uff43': 'c', '\uff47': 'g', '\uff4b': 'k', '\uff4f': 'o', '\uff53': 's', '\uff57': 'w', '\uff5b': '{', '\uff63': '\u300d', '\uff67': '\u30a1', '\uff6b': '\u30a9', '\uff6f': '\u30c3', '\uff73': '\u30a6', '\uff77': '\u30ad', '\uff7b': '\u30b5', '\uff2b': 'K', '\uff7f': '\u30bd'}
+RefactoringTool: No changes to verbuild.py
+RefactoringTool: Files that were modified:
+RefactoringTool: gui.py
+RefactoringTool: guires.py
+RefactoringTool: lzari.py
+RefactoringTool: mymc.py
+RefactoringTool: ps2mc_dir.py
+RefactoringTool: ps2mc_ecc.py
+RefactoringTool: ps2mc.py
+RefactoringTool: ps2save.py
+RefactoringTool: round.py
+RefactoringTool: sjistab.py
+RefactoringTool: verbuild.py

@@ -132,16 +132,16 @@ class lzari_codec(object):
 			self.code = 0
 			# reverse the order of sym_cum so bisect_right() can
 			# be used for faster searching
-			self.sym_cum = range(0, MAX_CHAR + 1)
+			self.sym_cum = list(range(0, MAX_CHAR + 1))
 		else:
 			self.shifts = 0
-			self.char_to_symbol = range(1, MAX_CHAR + 1)
-			self.sym_cum = range(MAX_CHAR, -1, -1)
+			self.char_to_symbol = list(range(1, MAX_CHAR + 1))
+			self.sym_cum = list(range(MAX_CHAR, -1, -1))
 			self.next_table = [None] * HIST_LEN
 			self.next2_table = [None] * HIST_LEN
 			self.suffix_table = {}
 
-		self.symbol_to_char = [0] + range(MAX_CHAR)
+		self.symbol_to_char = [0] + list(range(MAX_CHAR))
 		self.sym_freq = [0] + [1] * MAX_CHAR
 		self.position_cum = [0] * (HIST_LEN + 1)
 		a = 0
@@ -437,12 +437,12 @@ class lzari_codec(object):
 		r = self.add_suffix_2(pos, find)
 		start_pos = self.start_pos
 		if find and r[0] != None:
-			print ("%4d %02x %4d %2d"
+			print(("%4d %02x %4d %2d"
 			       % (pos - start_pos, ord(self.src[pos]),
-				  r[0] - start_pos, r[1]))
+				  r[0] - start_pos, r[1])))
 		else:
-			print ("%4d %02x"
-				       % (pos - start_pos, ord(self.src[pos])))
+			print(("%4d %02x"
+				       % (pos - start_pos, ord(self.src[pos]))))
 		return r
 	
 	add_suffix = add_suffix_2
@@ -582,7 +582,7 @@ class lzari_codec(object):
 		
 		a = string_to_bit_array(src)
 		a.fromlist([0] * 32)	 # add some extra bits 
-		self.in_iter = iter(a).next
+		self.in_iter = iter(a).__next__
 
 		out = array.array('B', "\0") * out_length
 		outpos = 0
@@ -646,7 +646,7 @@ else:
 		out = ctypes.create_string_buffer(out_length)
 		if (mylzari_decode(src, len(src), out, out_length, progress)
 		    == -1):
-			raise ValueError, "compressed input is corrupt"
+			raise ValueError("compressed input is corrupt")
 		return ctypes.string_at(out, out_length)
 
 	def encode(src, progress = None):
@@ -654,7 +654,7 @@ else:
 							   progress)
 		# print r, compressed.value, comp_len
 		if r == -1:
-			raise MemoryError, "out of memory during compression"
+			raise MemoryError("out of memory during compression")
 		if compressed.value == None:
 			return ""
 		ret = ctypes.string_at(compressed.value, comp_len.value)
@@ -679,7 +679,7 @@ def main2(args):
 		now = os.times()
 	out.write(dest)
 	out.close()
-	print "time:", now[0] - start[0], now[1] - start[1], now[4] - start[4]
+	print("time:", now[0] - start[0], now[1] - start[1], now[4] - start[4])
 
 
 def _get_hotshot_lineinfo(filename):
@@ -694,7 +694,7 @@ def _get_hotshot_lineinfo(filename):
 			else:
 				a[0] += 1
 				a[1] += tdelta
-	return timings.items()
+	return list(timings.items())
 
 def _dump_hotshot_lineinfo(log):
 	a = sorted(_get_hotshot_lineinfo(log))
@@ -703,10 +703,10 @@ def _dump_hotshot_lineinfo(log):
 	total_time = sum((time[1]
 			  for (loc, time) in a))
 	for (loc, [count, time]) in a:
-		print ("%8d %6.3f%%  %8d %6.3f%%"
+		print(("%8d %6.3f%%  %8d %6.3f%%"
 		       % (time, time * 100.0 / total_time,
-			  count, count * 100.0 / total_count)),
-		print "%s:%d(%s)" % loc
+			  count, count * 100.0 / total_count)), end=' ')
+		print("%s:%d(%s)" % loc)
 
 def _dump_hotshot_lineinfo2(log):
 	cur = None
@@ -719,7 +719,7 @@ def _dump_hotshot_lineinfo2(log):
 		if cur != filename:
 			if cur != None and f != None:
 				for line in f:
-					print line[:-1]
+					print(line[:-1])
 				f.close()
 			try:
 				f = file(filename, "r")
@@ -727,17 +727,17 @@ def _dump_hotshot_lineinfo2(log):
 				f = None
 			cur = filename
 			l = 0
-			print "#", filename
+			print("#", filename)
 		if f != None:
 			while l < lineno:
-				print f.readline()[:-1]
+				print(f.readline()[:-1])
 				l += 1
-		print ("# %8d %6.3f%%  %8d %6.3f%%"
+		print(("# %8d %6.3f%%  %8d %6.3f%%"
 		       % (time, time * 100.0 / total_time,
-			  count, count * 100.0 / total_count))
+			  count, count * 100.0 / total_count)))
 	if cur != None and f != None:
 		for line in f:
-			print line[:-1]
+			print(line[:-1])
 		f.close()
 	
 def main(args):
@@ -747,7 +747,7 @@ def main(args):
 		import profile
 		pr = profile.Profile()
 		for i in range(5):
-			print pr.calibrate(100000)
+			print(pr.calibrate(100000))
 		return
 	elif args[1] == "p":
 		import profile

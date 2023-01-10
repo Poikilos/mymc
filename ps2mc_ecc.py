@@ -105,13 +105,13 @@ def _ecc_check(s, ecc):
 	#				    lp_comp, cp_comp)
 
 	if lp_comp == 0x7F and cp_comp == 0x07:
-		print "corrected 1"
+		print("corrected 1")
 		# correctable 1 bit error in data
 		s[lp1_diff] ^= 1 << (cp_diff >> 4)
 		return ECC_CHECK_CORRECTED
 	if ((cp_diff == 0 and lp0_diff == 0 and lp1_diff == 0)
 	      or _popcount(lp_comp) + _popcount(cp_comp) == 1):
-		print "corrected 2"
+		print("corrected 2")
 		# correctable 1 bit error in ECC
 		# (and/or one of the unused bits was set)
 		ecc[0] = computed[0]
@@ -141,7 +141,7 @@ def ecc_check_page(page, spare):
 	for i in range(div_round_up(len(page), 128)):
 		a = array.array('B')
 		a.fromstring(page[i * 128 : i * 128 + 128])
-		chunks.append((a, map(ord, spare[i * 3 : i * 3 + 3])))
+		chunks.append((a, list(map(ord, spare[i * 3 : i * 3 + 3]))))
 	
 	r = [ecc_check(s, ecc)
 	     for (s, ecc) in chunks]

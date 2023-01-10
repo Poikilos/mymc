@@ -12,7 +12,7 @@ _SCCS_ID = "@(#) mymc gui.py 1.8 22/02/05 19:20:59\n"
 import os
 import sys
 import struct
-import cStringIO
+import io
 import time
 from functools import partial
 
@@ -96,12 +96,12 @@ def single_title(title):
 	"""Convert the two parts of an icon.sys title into one string."""
 	
 	title = title[0] + " " + title[1]
-	return u" ".join(title.split())
+	return " ".join(title.split())
 
 def _get_icon_resource_as_images(name):
 	ico = guires.resources[name]
 	images = []
-	f = cStringIO.StringIO(ico)
+	f = io.StringIO(ico)
 	count = struct.unpack("<HHH", ico[0:6])[2]
 	# count = wx.Image_GetImageCount(f, wx.BITMAP_TYPE_ICO)
 	for i in range(count):
@@ -347,7 +347,7 @@ class icon_window(wx.Window):
 		r = mymcicon.init_icon_renderer(focus.GetHandle(),
 					       self.GetHandle())
 		if r == -1:
-			print "init_icon_renderer failed"
+			print("init_icon_renderer failed")
 			self.failed = True
 			return
 		
@@ -384,7 +384,7 @@ class icon_window(wx.Window):
 			r = mymcicon.load_icon(icon_sys, len(icon_sys),
 					      icon, len(icon))
 		if r != 0:
-			print "load_icon", r
+			print("load_icon", r)
 			self.failed = True
 
 	def _set_lighting(self, lighting, vertex_diffuse, alt_lighting,
@@ -634,13 +634,13 @@ class gui_frame(wx.Frame):
 		if self.mc != None:
 			try:
 				self.mc.close()
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value)
 			self.mc = None
 		if self.f != None:
 			try:
 				self.f.close()
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value)
 			self.f = None
 		self.mcname = None
@@ -648,7 +648,7 @@ class gui_frame(wx.Frame):
 	def refresh(self):
 		try:
 			self.dirlist.update(self.mc)
-		except EnvironmentError, value:
+		except EnvironmentError as value:
 			self.mc_error(value)
 			self._close_mc()
 			self.dirlist.update(None)
@@ -676,7 +676,7 @@ class gui_frame(wx.Frame):
 		try:
 			f = file(filename, "r+b")
 			mc = ps2mc.ps2mc(f)
-		except EnvironmentError, value:
+		except EnvironmentError as value:
 			if f != None:
 				f.close()
 			self.mc_error(value, filename)
@@ -718,8 +718,8 @@ class gui_frame(wx.Frame):
 				icon = f.read()
 			finally:
 				f.close()
-		except EnvironmentError, value:
-			print "icon failed to load", value
+		except EnvironmentError as value:
+			print("icon failed to load", value)
 			self.icon_win.load_icon(None, None)
 			return
 
@@ -758,7 +758,7 @@ class gui_frame(wx.Frame):
 				sf = mc.export_save_file("/" + dirname)
 				longname = ps2save.make_longname(dirname, sf)
 				sfiles.append((dirname, sf, longname))
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value. dirname)
 
 		if len(sfiles) == 0:
@@ -786,7 +786,7 @@ class gui_frame(wx.Frame):
 						sf.save_ems(f)
 				finally:
 					f.close()
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value, fn)
 				return
 
@@ -808,7 +808,7 @@ class gui_frame(wx.Frame):
 				sf.save_ems(f)
 				f.close()
 				count += 1
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value, fn)
 		if count > 0:
 			if os.path.isabs(dir):
@@ -868,7 +868,7 @@ class gui_frame(wx.Frame):
 			try:
 				self._do_import(fn)
 				success = fn
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value, fn)
 
 		if success != None:
@@ -904,7 +904,7 @@ class gui_frame(wx.Frame):
 		for dn in dirnames:
 			try:
 				mc.rmdir("/" + dn)
-			except EnvironmentError, value:
+			except EnvironmentError as value:
 				self.mc_error(value, dn)
 
 		mc.check()
@@ -936,11 +936,11 @@ if __name__ == "__main__":
 
  	gc.collect()
  	for o in gc.garbage:
- 		print 
- 		print o
+ 		print() 
+ 		print(o)
  		if type(o) == ps2mc.ps2mc_file:
  			for m in dir(o):
- 				print m, getattr(o, m)
+ 				print(m, getattr(o, m))
 
 
 # 	while True:
